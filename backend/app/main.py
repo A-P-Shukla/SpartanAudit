@@ -44,12 +44,16 @@ def get_github_raw_url(repo_url: str, file_path: str, branch: str = "main"):
 def fetch_repo_metadata(repo_url: str):
     """
     Checks for key 'Proof of Engineering' files without cloning.
+    Scans root and common monorepo subdirectories.
     """
     files_to_check = {
         "readme": ["README.md", "readme.md", "README.markdown"],
         "infra": ["Dockerfile", "docker-compose.yml", "docker-compose.yaml", ".github/workflows/main.yml", ".github/workflows/ci.yml"],
         "stack": ["package.json", "requirements.txt", "go.mod", "Cargo.toml", "pom.xml", "build.gradle", "Composer.json"]
     }
+    
+    # Common monorepo subdirectory prefixes
+    subdir_prefixes = ["", "backend/", "frontend/", "server/", "client/", "api/", "app/", "src/"]
     
     found_files = []
     readme_content = ""
@@ -58,21 +62,24 @@ def fetch_repo_metadata(repo_url: str):
     # Try 'main' then 'master' branches
     for branch in ["main", "master"]:
         current_found = []
-        for category, filenames in files_to_check.items():
-            for filename in filenames:
-                raw_url = get_github_raw_url(repo_url, filename, branch)
-                if not raw_url: continue
-                
-                try:
-                    res = requests.get(raw_url, timeout=5)
-                    if res.status_code == 200:
-                        current_found.append(filename)
-                        if category == "readme" and not readme_content:
-                            readme_content = res.text[:5000] # Limit size
-                        if category == "stack":
-                            tech_stack.append(filename)
-                except:
-                    pass
+        for prefix in subdir_prefixes:
+            for category, filenames in files_to_check.items():
+                for filename in filenames:
+                    full_path = f"{prefix}{filename}"
+                    raw_url = get_github_raw_url(repo_url, full_path, branch)
+                    if not raw_url: continue
+                    
+                    try:
+                        res = requests.get(raw_url, timeout=5)
+                        if res.status_code == 200:
+                            current_found.append(full_path)
+                            # Prefer root README, but take subdir if not found
+                            if category == "readme" and not readme_content:
+                                readme_content = res.text[:5000]
+                            if category == "stack":
+                                tech_stack.append(full_path)
+                    except:
+                        pass
         
         if current_found:
             found_files = list(set(current_found))
