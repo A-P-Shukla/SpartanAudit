@@ -1,37 +1,26 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import styles from './GenerateAudit.module.css';
-import AuditReport from './AuditReport';
 
 const GenerateAudit = ({ apiUrl, onAuditComplete }) => {
     const [repoUrl, setRepoUrl] = useState('');
     const [jobDescription, setJobDescription] = useState('');
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [auditResult, setAuditResult] = useState(null);
+    const [error, setError] = useState('');
 
-    const handleAudit = async () => {
-        if (!repoUrl) {
-            setError("Repo URL is mandatory. Spartans don't audit thin air.");
-            return;
-        }
-
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         setLoading(true);
-        setError(null);
-        setAuditResult(null);
+        setError('');
 
         try {
             const response = await axios.post(`${apiUrl}/audit/`, {
                 repo_url: repoUrl,
                 job_description: jobDescription || null
             });
-
-            setAuditResult(response.data);
-            if (onAuditComplete) onAuditComplete();
-
+            onAuditComplete(response.data);
         } catch (err) {
-            console.error("Audit failed:", err);
-            setError(err.response?.data?.detail || "The Spartan Engine failed. Check your connection.");
+            setError(err.response?.data?.detail || 'Failed to generate audit. Ensure the repo is public.');
         } finally {
             setLoading(false);
         }
@@ -39,61 +28,41 @@ const GenerateAudit = ({ apiUrl, onAuditComplete }) => {
 
     return (
         <div className={styles.container}>
-            {/* Input Section */}
-            {!auditResult && (
-                <div className={styles.inputCard}>
-                    <h2 className={styles.title}>Initiate Reconnaissance</h2>
+            <div className={styles.hero}>
+                <h2 className={styles.title}>Relevancy & Quality Screener</h2>
+                <p className={styles.subtitle}>Enter a GitHub URL. Get a brutal, AI-powered engineering audit in seconds.</p>
+            </div>
 
-                    <div className={styles.formGroup}>
-                        <label className={styles.label}>GITHUB REPOSITORY URL *</label>
-                        <input
-                            type="url"
-                            className={styles.input}
-                            placeholder="https://github.com/username/project"
-                            value={repoUrl}
-                            onChange={(e) => setRepoUrl(e.target.value)}
-                            disabled={loading}
-                        />
-                    </div>
-
-                    <div className={styles.formGroup}>
-                        <label className={styles.label}>JOB DESCRIPTION (OPTIONAL)</label>
-                        <textarea
-                            className={styles.textarea}
-                            placeholder="Paste the JD here to run the Relevancy Check..."
-                            value={jobDescription}
-                            onChange={(e) => setJobDescription(e.target.value)}
-                            disabled={loading}
-                        />
-                    </div>
-
-                    {error && <div className={styles.error}>⚠️ {error}</div>}
-
-                    <button
-                        className={styles.auditButton}
-                        onClick={handleAudit}
-                        disabled={loading}
-                    >
-                        {loading ? "INITIALIZING SCANNERS..." : "RUN SPARTAN AUDIT"}
-                    </button>
-
-                    {loading && (
-                        <div className={styles.loadingContainer}>
-                            <p>Fetching Repository...</p>
-                            <p>Checking Docker Configs...</p>
-                            <p>Consulting Cynical Staff Engineer...</p>
-                        </div>
-                    )}
+            <form onSubmit={handleSubmit} className={styles.form}>
+                <div className={styles.inputGroup}>
+                    <label>Repository URL <span className={styles.required}>*</span></label>
+                    <input
+                        type="url"
+                        placeholder="https://github.com/username/project"
+                        value={repoUrl}
+                        onChange={(e) => setRepoUrl(e.target.value)}
+                        required
+                        className={styles.input}
+                    />
                 </div>
-            )}
 
-            {/* Results Section */}
-            {auditResult && (
-                <AuditReport
-                    data={auditResult}
-                    onReset={() => setAuditResult(null)}
-                />
-            )}
+                <div className={styles.inputGroup}>
+                    <label>Job Description (Optional)</label>
+                    <textarea
+                        placeholder="Paste the JD here to check for relevancy match..."
+                        value={jobDescription}
+                        onChange={(e) => setJobDescription(e.target.value)}
+                        className={styles.textarea}
+                        rows={4}
+                    />
+                </div>
+
+                {error && <div className={styles.error}>{error}</div>}
+
+                <button type="submit" className={styles.submitButton} disabled={loading}>
+                    {loading ? 'RUNNING AUDIT...' : 'AUDIT THIS REPO'}
+                </button>
+            </form>
         </div>
     );
 };

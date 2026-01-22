@@ -1,113 +1,104 @@
+/* GenerateAudit.module.css */
 .container {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
 }
 
-.inputCard {
-    background-color: var(--surface-color);
-    border: 1px solid var(--border-color);
-    padding: 2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+.hero {
+    margin-bottom: 3rem;
 }
 
 .title {
-    margin: 0;
+    font-size: 3rem;
+    font-weight: 900;
+    color: #fff;
+    margin-bottom: 1rem;
+    letter-spacing: -1px;
+}
+
+.subtitle {
     font-size: 1.2rem;
-    color: var(--text-main);
-    border-left: 4px solid var(--primary-red);
-    padding-left: 1rem;
+    color: #888;
+}
+
+.form {
+    background: #1a1a1a;
+    padding: 2.5rem;
+    border-radius: 8px;
+    border: 1px solid #333;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+    text-align: left;
+}
+
+.inputGroup {
+    margin-bottom: 1.5rem;
+}
+
+.inputGroup label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #ccc;
     text-transform: uppercase;
-    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
 }
 
-.formGroup {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.label {
-    font-family: var(--font-mono);
-    font-size: 0.9rem;
-    color: var(--text-muted);
+.required {
+    color: #ff4d4d;
 }
 
 .input,
 .textarea {
-    background-color: var(--bg-color);
-    border: 1px solid var(--border-color);
+    width: 100%;
     padding: 1rem;
-    color: var(--text-main);
-    font-family: var(--font-mono);
+    background: #000;
+    border: 1px solid #333;
+    border-radius: 4px;
+    color: #fff;
+    font-family: inherit;
     font-size: 1rem;
-    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+    /* Fix for padding overflow */
 }
 
 .input:focus,
 .textarea:focus {
-    border-color: var(--primary-red);
+    border-color: #ff4d4d;
+    outline: none;
 }
 
-.textarea {
-    resize: vertical;
-    min-height: 120px;
-}
-
-.auditButton {
-    background-color: var(--primary-red);
-    color: white;
+.submitButton {
+    width: 100%;
+    padding: 1.2rem;
+    background: #c0392b;
+    color: #fff;
     border: none;
-    padding: 1rem;
-    font-family: var(--font-mono);
-    font-weight: 700;
+    border-radius: 4px;
+    font-size: 1.1rem;
+    font-weight: 800;
     text-transform: uppercase;
-    font-size: 1rem;
-    letter-spacing: 1px;
-    transition: all 0.2s;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 1rem;
 }
 
-.auditButton:hover {
-    background-color: #c0392b;
-    transform: translateY(-2px);
+.submitButton:hover {
+    background: #e74c3c;
 }
 
-.auditButton:disabled {
-    background-color: #333;
-    color: #555;
+.submitButton:disabled {
+    background: #555;
     cursor: not-allowed;
-    transform: none;
 }
 
 .error {
-    color: var(--primary-red);
-    font-family: var(--font-mono);
-    font-size: 0.9rem;
+    color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.1);
     padding: 1rem;
-    background: rgba(231, 76, 60, 0.1);
-    border-left: 2px solid var(--primary-red);
-}
-
-.loadingContainer {
-    text-align: center;
-    padding: 2rem;
-    color: var(--text-muted);
-    font-family: var(--font-mono);
-    animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-    0% {
-        opacity: 0.5;
-    }
-
-    50% {
-        opacity: 1;
-    }
-
-    100% {
-        opacity: 0.5;
-    }
+    margin-bottom: 1.5rem;
+    border: 1px solid #d63031;
+    border-radius: 4px;
 }

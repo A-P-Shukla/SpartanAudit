@@ -1,139 +1,166 @@
-.reportContainer {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-    animation: fadeIn 0.5s ease-in;
+/* AuditReport.module.css */
+.container {
+    max-width: 900px;
+    margin: 0 auto;
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
+.backButton {
+    background: none;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+    padding: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.backButton:hover {
+    color: #fff;
+    text-decoration: underline;
+}
+
+.header {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.repoTitle a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 2rem;
+    border-bottom: 2px solid #333;
+}
+
+.date {
+    display: block;
+    margin-top: 0.5rem;
+    color: #666;
+    font-size: 0.9rem;
 }
 
 .verdictBanner {
     padding: 2rem;
+    border-radius: 8px;
     text-align: center;
-    border: 2px solid;
-    font-family: var(--font-mono);
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    font-weight: 800;
-    font-size: 1.5rem;
+    margin-bottom: 3rem;
+    border: 2px solid transparent;
 }
 
-.verdictBanner.green {
-    background-color: rgba(46, 204, 113, 0.1);
-    border-color: var(--primary-green);
-    color: var(--primary-green);
+.verdictGreen {
+    background: rgba(46, 204, 113, 0.1);
+    border-color: #2ecc71;
+    color: #2ecc71;
 }
 
-.verdictBanner.yellow {
-    background-color: rgba(241, 196, 15, 0.1);
-    border-color: var(--spartan-gold);
-    color: var(--spartan-gold);
+.verdictYellow {
+    background: rgba(241, 196, 15, 0.1);
+    border-color: #f1c40f;
+    color: #f1c40f;
 }
 
-.verdictBanner.red {
-    background-color: rgba(231, 76, 60, 0.1);
-    border-color: var(--primary-red);
-    color: var(--primary-red);
+.verdictRed {
+    background: rgba(231, 76, 60, 0.1);
+    border-color: #e74c3c;
+    color: #e74c3c;
 }
 
-.scoreGrid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-}
-
-.scoreCard {
-    background-color: var(--surface-color);
-    border: 1px solid var(--border-color);
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.scoreLabel {
-    font-family: var(--font-mono);
-    color: var(--text-muted);
-    font-size: 0.9rem;
-    text-transform: uppercase;
-}
-
-.scoreValue {
-    font-family: var(--font-sans);
-    font-weight: 800;
+.verdictText {
+    margin: 0;
     font-size: 3rem;
-    color: var(--text-main);
-}
-
-.critiqueCard {
-    background-color: var(--surface-color);
-    border: 1px solid var(--border-color);
-    padding: 1.5rem;
-}
-
-.critiqueHeader {
-    font-family: var(--font-mono);
-    color: var(--primary-red);
     text-transform: uppercase;
-    font-size: 1rem;
-    margin-bottom: 1rem;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 0.5rem;
-    display: flex;
-    justify-content: space-between;
+    font-weight: 900;
+    letter-spacing: -1px;
 }
 
-.critiqueText {
-    font-family: var(--font-sans);
-    line-height: 1.6;
-    color: var(--text-main);
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.statCard {
+    background: #1a1a1a;
+    padding: 2rem;
+    border-radius: 8px;
+    border: 1px solid #333;
+    text-align: center;
+}
+
+.statLabel {
+    display: block;
+    color: #888;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+}
+
+.statValue {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #fff;
+}
+
+.section {
+    margin-bottom: 3rem;
+}
+
+.section h3 {
+    border-bottom: 1px solid #333;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 1px;
     font-size: 1.1rem;
 }
 
-.techStack {
+.critiqueText {
+    font-size: 1.2rem;
+    line-height: 1.7;
+    color: #ddd;
+    background: #111;
+    padding: 2rem;
+    border-left: 4px solid #c0392b;
+    border-radius: 0 4px 4px 0;
+}
+
+.reconGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.reconItem strong {
+    display: block;
+    margin-bottom: 1rem;
+    color: #fff;
+}
+
+.tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: 1rem;
+    gap: 0.8rem;
 }
 
-.techBadge {
-    background-color: var(--bg-color);
-    border: 1px solid var(--border-color);
-    padding: 0.25rem 0.5rem;
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    color: var(--text-muted);
+.tag {
+    background: #2c3e50;
+    color: #ecf0f1;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-family: monospace;
 }
 
-.resetButton {
-    background-color: transparent;
-    border: 1px solid var(--text-muted);
-    color: var(--text-muted);
-    padding: 1rem;
-    font-family: var(--font-mono);
-    text-transform: uppercase;
-    transition: all 0.2s;
-}
-
-.resetButton:hover {
-    border-color: var(--text-main);
-    color: var(--text-main);
-}
-
-@media(max-width: 600px) {
-    .scoreGrid {
-        grid-template-columns: 1fr;
-    }
+.fileTag {
+    background: #34495e;
+    color: #3498db;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-family: monospace;
+    border: 1px solid #2980b9;
 }

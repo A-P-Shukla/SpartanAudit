@@ -1,85 +1,89 @@
-.historyContainer {
-    display: flex;
-    flex-direction: column;
+/* AuditHistory.module.css */
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.title {
+    margin-bottom: 2rem;
+    font-size: 2rem;
+    color: #fff;
+    border-bottom: 1px solid #333;
+    padding-bottom: 1rem;
+}
+
+.empty {
+    color: #666;
+    font-style: italic;
+    text-align: center;
+    padding: 4rem;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1.5rem;
 }
 
-.historyHeader {
-    font-family: var(--font-mono);
-    font-size: 1.2rem;
-    color: var(--text-muted);
-    border-bottom: 2px solid var(--border-color);
-    padding-bottom: 1rem;
+.card {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    padding: 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    border-color: #555;
+    background: #222;
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
     margin-bottom: 1rem;
 }
 
-.auditRow {
-    background-color: var(--surface-color);
-    border: 1px solid var(--border-color);
-    padding: 1.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: all 0.2s;
-}
-
-.auditRow:hover {
-    border-color: var(--text-muted);
-}
-
-.auditInfo {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
 .repoUrl {
-    font-family: var(--font-mono);
-    color: var(--text-main);
-    font-weight: 700;
-    text-decoration: none;
-    font-size: 1.1rem;
+    color: #3498db;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 70%;
 }
 
-.repoUrl:hover {
-    text-decoration: underline;
+.badge {
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-weight: 800;
+    font-size: 0.9rem;
+}
+
+.green {
+    background: rgba(46, 204, 113, 0.2);
+    color: #2ecc71;
+}
+
+.red {
+    background: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+}
+
+.verdictPreview {
+    color: #ccc;
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+    font-weight: 500;
+    text-transform: uppercase;
 }
 
 .date {
+    color: #666;
     font-size: 0.8rem;
-    color: var(--text-muted);
-}
-
-.verdictBadge {
-    font-family: var(--font-mono);
-    font-size: 0.9rem;
-    padding: 0.5rem 1rem;
-    border: 1px solid;
-    text-transform: uppercase;
-    font-weight: 700;
-}
-
-.verdictBadge.green {
-    color: var(--primary-green);
-    border-color: var(--primary-green);
-    background-color: rgba(46, 204, 113, 0.1);
-}
-
-.verdictBadge.yellow {
-    color: var(--spartan-gold);
-    border-color: var(--spartan-gold);
-    background-color: rgba(241, 196, 15, 0.1);
-}
-
-.verdictBadge.red {
-    color: var(--primary-red);
-    border-color: var(--primary-red);
-    background-color: rgba(231, 76, 60, 0.1);
-}
-
-.loading {
-    color: var(--text-muted);
-    font-family: var(--font-mono);
-    text-align: center;
-    padding: 2rem;
+    display: block;
+    text-align: right;
 }

@@ -1,61 +1,72 @@
 import React, { useState, useEffect } from 'react';
 import styles from './App.module.css';
 import GenerateAudit from './components/GenerateAudit';
-import AuditHistory from './components/AuditHistory'; // We'll rename PastQuizzes later
+import AuditHistory from './components/AuditHistory';
+import AuditReport from './components/AuditReport';
 
-const API_URL = 'http://127.0.0.1:8000'; // Development URL
+const API_URL = 'http://localhost:8000'; // Hardcoded for local dev
 
 function App() {
-  const [activeTab, setActiveTab] = useState('audit');
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [activeTab, setActiveTab] = useState('new');
+  const [historyKey, setHistoryKey] = useState(1);
+  const [currentAudit, setCurrentAudit] = useState(null);
 
+  // --- TITLE BLOCK ---
   useEffect(() => {
-    document.title = activeTab === 'audit' 
-      ? 'SpartanAudit - Code Quality Screener' 
-      : 'SpartanAudit - Audit History';
+    document.title = activeTab === 'new' ? 'SpartanAudit - New Audit' : 'SpartanAudit - History';
   }, [activeTab]);
+
+  const handleAuditComplete = (auditData) => {
+    setCurrentAudit(auditData);
+    setHistoryKey(prev => prev + 1); // Refresh history
+  };
+
+  const handleStartNew = () => {
+    setCurrentAudit(null);
+    setActiveTab('new');
+  };
 
   return (
     <div className={styles.appWrapper}>
       <header className={styles.header}>
         <div className={styles.headerContent}>
-          <div className={styles.logoIcon}>🛡️</div>
-          <h1 className={styles.appName}>SpartanAudit</h1>
-          <span className={styles.tagline}>// Code Quality & Relevancy Screener</span>
+          <div className={styles.logoGroup} onClick={handleStartNew}>
+            <span className={styles.logoIcon}>⚔️</span>
+            <h1 className={styles.appName}>SpartanAudit</h1>
+          </div>
+          <nav className={styles.nav}>
+            <button
+              className={`${styles.navButton} ${activeTab === 'new' ? styles.active : ''}`}
+              onClick={handleStartNew}
+            >
+              New Audit
+            </button>
+            <button
+              className={`${styles.navButton} ${activeTab === 'history' ? styles.active : ''}`}
+              onClick={() => { setActiveTab('history'); setCurrentAudit(null); }}
+            >
+              History
+            </button>
+          </nav>
         </div>
       </header>
-      
-      <main className={styles.mainContent}>
-        <nav className={styles.tabContainer}>
-          <button 
-            className={`${styles.tab} ${activeTab === 'audit' ? styles.active : ''}`} 
-            onClick={() => setActiveTab('audit')}>
-            Run Audit
-          </button>
-          <button 
-            className={`${styles.tab} ${activeTab === 'history' ? styles.active : ''}`} 
-            onClick={() => setActiveTab('history')}>
-            History
-          </button>
-        </nav>
 
-        <div className={styles.contentArea}>
-          {activeTab === 'audit' ? (
-            <GenerateAudit 
-                apiUrl={API_URL} 
-                onAuditComplete={() => setRefreshKey(k => k + 1)}
-            />
-          ) : (
-             <AuditHistory key={refreshKey} apiUrl={API_URL} />
-          )}
-        </div>
+      <main className={styles.mainContent}>
+        {activeTab === 'new' && !currentAudit && (
+          <GenerateAudit apiUrl={API_URL} onAuditComplete={handleAuditComplete} />
+        )}
+
+        {currentAudit && (
+          <AuditReport data={currentAudit} onBack={handleStartNew} />
+        )}
+
+        {activeTab === 'history' && !currentAudit && (
+          <AuditHistory key={historyKey} apiUrl={API_URL} onViewAudit={setCurrentAudit} />
+        )}
       </main>
 
       <footer className={styles.footer}>
-        <div className={styles.footerContent}>
-            <span>&copy; {new Date().getFullYear()} TechKareer SpartanAudit</span>
-            <span>Built for the Bold.</span>
-        </div>
+        <p>&copy; {new Date().getFullYear()} SpartanAudit. Built for the bold.</p>
       </footer>
     </div>
   );
