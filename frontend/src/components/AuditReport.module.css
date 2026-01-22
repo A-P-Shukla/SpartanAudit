@@ -1,0 +1,139 @@
+.reportContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.verdictBanner {
+    padding: 2rem;
+    text-align: center;
+    border: 2px solid;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 800;
+    font-size: 1.5rem;
+}
+
+.verdictBanner.green {
+    background-color: rgba(46, 204, 113, 0.1);
+    border-color: var(--primary-green);
+    color: var(--primary-green);
+}
+
+.verdictBanner.yellow {
+    background-color: rgba(241, 196, 15, 0.1);
+    border-color: var(--spartan-gold);
+    color: var(--spartan-gold);
+}
+
+.verdictBanner.red {
+    background-color: rgba(231, 76, 60, 0.1);
+    border-color: var(--primary-red);
+    color: var(--primary-red);
+}
+
+.scoreGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.scoreCard {
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.scoreLabel {
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+.scoreValue {
+    font-family: var(--font-sans);
+    font-weight: 800;
+    font-size: 3rem;
+    color: var(--text-main);
+}
+
+.critiqueCard {
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    padding: 1.5rem;
+}
+
+.critiqueHeader {
+    font-family: var(--font-mono);
+    color: var(--primary-red);
+    text-transform: uppercase;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+.critiqueText {
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    color: var(--text-main);
+    font-size: 1.1rem;
+}
+
+.techStack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.techBadge {
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color);
+    padding: 0.25rem 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.resetButton {
+    background-color: transparent;
+    border: 1px solid var(--text-muted);
+    color: var(--text-muted);
+    padding: 1rem;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    transition: all 0.2s;
+}
+
+.resetButton:hover {
+    border-color: var(--text-main);
+    color: var(--text-main);
+}
+
+@media(max-width: 600px) {
+    .scoreGrid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,0 +1,113 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.inputCard {
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.title {
+    margin: 0;
+    font-size: 1.2rem;
+    color: var(--text-main);
+    border-left: 4px solid var(--primary-red);
+    padding-left: 1rem;
+    text-transform: uppercase;
+    font-family: var(--font-mono);
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.label {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.input,
+.textarea {
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color);
+    padding: 1rem;
+    color: var(--text-main);
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    outline: none;
+}
+
+.input:focus,
+.textarea:focus {
+    border-color: var(--primary-red);
+}
+
+.textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.auditButton {
+    background-color: var(--primary-red);
+    color: white;
+    border: none;
+    padding: 1rem;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 1rem;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+}
+
+.auditButton:hover {
+    background-color: #c0392b;
+    transform: translateY(-2px);
+}
+
+.auditButton:disabled {
+    background-color: #333;
+    color: #555;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.error {
+    color: var(--primary-red);
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    padding: 1rem;
+    background: rgba(231, 76, 60, 0.1);
+    border-left: 2px solid var(--primary-red);
+}
+
+.loadingContainer {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 0.5;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.5;
+    }
+}
