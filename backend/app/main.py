@@ -1,12 +1,12 @@
 import os
 import json
 import requests
-from bs4 import BeautifulSoup
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv
-from typing import List
+from typing import List, Optional
+from urllib.parse import urlparse
 
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import PromptTemplate
@@ -19,8 +19,8 @@ load_dotenv()
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
-    title="IntelliQuiz API",
-    description="API for generating quizzes from Wikipedia articles.",
+    title="SpartanAudit API",
+    description="Automated Code Quality & Relevancy Screener.",
     version="1.0.0"
 )
 
@@ -32,119 +32,135 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+def get_github_raw_url(repo_url: str, file_path: str, branch: str = "main"):
+    """Converts a GitHub repo URL into a raw content URL."""
+    parsed = urlparse(repo_url)
+    path_parts = parsed.path.strip("/").split("/")
+    if len(path_parts) < 2:
+        return None
+    owner, repo = path_parts[0], path_parts[1]
+    return f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{file_path}"
 
-def scrape_wikipedia_content(url: str):
-    try:
-        headers = {'User-Agent': 'IntelliQuizApp/1.0 (test@example.com)'}
-        response = requests.get(url, headers=headers, timeout=10)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.content, 'html.parser')
-        
-        title = soup.find('h1', id='firstHeading')
-        if not title:
-            raise ValueError("Could not find article title (h1 with id='firstHeading').")
-        
-        content_div = soup.find('div', id='mw-content-text')
-        if not content_div:
-             raise ValueError("Could not find main article content div.")
-        
-        paragraphs = content_div.find_all('p', limit=20)
-        text_content = "\n".join([p.get_text() for p in paragraphs if p.get_text().strip()])
-        sections = [h2.get_text().replace('[edit]', '').strip() for h2 in content_div.find_all('h2')]
-        
-        return {
-            "title": title.text, 
-            "text_content": text_content, 
-            "sections": sections,
-            "raw_html": response.text
-        }
-    except requests.exceptions.RequestException as e:
-        raise HTTPException(status_code=400, detail=f"Error fetching URL: {e} \nPlease enter a valid Wikipedia URL to begin.")
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=f"Error parsing page content: {e}")
-
-
-def generate_quiz_with_llm(text_content: str, title: str):
-    llm = ChatGoogleGenerativeAI(model="gemini-flash-lite-latest", google_api_key=os.getenv("GEMINI_API_KEY"), temperature=0.7)
-    prompt_template = """
-    Based on the following text about "{title}", generate a comprehensive JSON object for a quiz.
-    The JSON object must strictly adhere to this structure: {{"summary": "...", "key_entities": {{"people": [], "organizations": [], "locations": []}}, "quiz": [{{"question": "...", "options": [], "answer": "...", "explanation": "...", "difficulty": "..."}}], "related_topics": []}}
-
-    - "summary": A concise 2-3 sentence summary of the text.
-    - "key_entities": A dictionary with "people", "organizations", and "locations" as keys. Each key should have a list of relevant string names.
-    - "quiz": A list containing EXACTLY 10 quiz question objects. Each object MUST have these keys: "question", "options" (a list of exactly 4 unique strings), "answer" (one of the strings from the options list), "explanation" (a brief sentence on why the answer is correct), and "difficulty" (a string which must be one of 'easy', 'medium', or 'hard').
-    - "related_topics": A list of 3-5 strings representing related Wikipedia topics.
-
-    TEXT CONTENT:
-    {text}
-    
-    IMPORTANT: You must respond with ONLY the raw JSON object. Do not include any surrounding text, comments, or markdown formatting like ```json. Your entire response must be a single, valid JSON object.
+def fetch_repo_metadata(repo_url: str):
     """
+    Checks for key 'Proof of Engineering' files without cloning.
+    """
+    files_to_check = {
+        "readme": ["README.md", "readme.md", "README.markdown"],
+        "infra": ["Dockerfile", "docker-compose.yml", "docker-compose.yaml", ".github/workflows/main.yml", ".github/workflows/ci.yml"],
+        "stack": ["package.json", "requirements.txt", "go.mod", "Cargo.toml", "pom.xml", "build.gradle", "Composer.json"]
+    }
+    
+    found_files = []
+    readme_content = ""
+    tech_stack = []
+    
+    # Try 'main' then 'master' branches
+    for branch in ["main", "master"]:
+        current_found = []
+        for category, filenames in files_to_check.items():
+            for filename in filenames:
+                raw_url = get_github_raw_url(repo_url, filename, branch)
+                if not raw_url: continue
+                
+                try:
+                    res = requests.get(raw_url, timeout=5)
+                    if res.status_code == 200:
+                        current_found.append(filename)
+                        if category == "readme" and not readme_content:
+                            readme_content = res.text[:5000] # Limit size
+                        if category == "stack":
+                            tech_stack.append(filename)
+                except:
+                    pass
+        
+        if current_found:
+            found_files = list(set(current_found))
+            break
+            
+    if not readme_content and not found_files:
+        raise HTTPException(status_code=404, detail="Repository not found or lacks a README. Spartans don't audit ghosts.")
+        
+    return {
+        "found_files": found_files,
+        "readme_content": readme_content,
+        "tech_stack": tech_stack
+    }
+
+def generate_audit_report(metadata: dict, jd: Optional[str]):
+    llm = ChatGoogleGenerativeAI(model="gemini-flash-lite-latest", google_api_key=os.getenv("GEMINI_API_KEY"), temperature=0.7)
+    
+    prompt_template = """
+    You are a Cynical Staff Engineer at a high-growth startup. Your job is to audit a candidate's GitHub repository.
+    Be ruthless, efficient, and uncompromising. You see through "Tutorial Hell" projects.
+
+    MISSION:
+    1. Determine if this is "Production-Grade Engineering" or "Spaghetti Code/Tutorial".
+    2. Provide a 0-10 Engineering Score.
+    3. (Optional) If a Job Description is provided, calculate a 0-100% Relevancy Match.
+    4. Provide a brutal one-paragraph critique.
+    5. Assign a Verdict: "HIRE THIS SPARTAN" (High Quality+Match), "GOOD DEV, WRONG FIT" (High Quality, Low Match), or "TUTORIAL HELL" (Low Quality).
+
+    DATA FOUND:
+    - Files detected: {found_files}
+    - Tech stack identified: {tech_stack}
+    - README Content: {readme_content}
+
+    {jd_section}
+
+    RESPONSE FORMAT: Respond with ONLY raw JSON. No markdown prefix.
+    {{
+        "engineering_score": float,
+        "match_score": float (null if no JD),
+        "critique": "string (brutal paragraph)",
+        "verdict": "string",
+        "tech_stack_inferred": ["string"]
+    }}
+    """
+    
+    jd_section = f"JOB DESCRIPTION FOR RELEVANCY CHECK:\n{jd}" if jd else "No Job Description provided. Skip Relevancy Match."
+    
     prompt = PromptTemplate.from_template(prompt_template)
     chain = prompt | llm | StrOutputParser()
-    response_str = chain.invoke({"text": text_content, "title": title})
+    
+    response_str = chain.invoke({
+        "found_files": metadata["found_files"],
+        "tech_stack": metadata["tech_stack"],
+        "readme_content": metadata["readme_content"],
+        "jd_section": jd_section
+    })
     
     try:
         clean_json_str = response_str.strip().lstrip("```json").rstrip("```")
         return json.loads(clean_json_str)
     except json.JSONDecodeError:
-        raise HTTPException(status_code=500, detail="The AI model returned a response that was not valid JSON. The response was: " + response_str)
+        raise HTTPException(status_code=500, detail="The AI brain glitched. Result: " + response_str)
 
-
-# --- API Endpoints ---
-
-@app.post("/generate-quiz/", response_model=schemas.Quiz, status_code=201)
-def generate_quiz_from_url(req: schemas.QuizGenerationRequest, db: Session = Depends(get_db)):
+@app.post("/audit/", response_model=schemas.AuditResponse, status_code=201)
+def run_audit(req: schemas.AuditRequest, db: Session = Depends(get_db)):
+    repo_url_str = str(req.repo_url)
     
-    # Convert the special Pydantic HttpUrl to a plain string immediately.
-    # Then, use this plain string variable everywhere else.
-    url_as_string = str(req.url)
-
-    db_quiz = crud.get_quiz_by_url(db, url=url_as_string)
-    if db_quiz:
-        return db_quiz
-
-    scraped_data = scrape_wikipedia_content(url_as_string)
-    if not scraped_data['text_content']:
-        raise HTTPException(status_code=422, detail="Could not extract enough content from the article to generate a quiz.")
-
-    llm_data = generate_quiz_with_llm(scraped_data["text_content"], scraped_data["title"])
+    # Metadata gathering (Reconnaissance)
+    metadata = fetch_repo_metadata(repo_url_str)
     
-    full_quiz_data = schemas.QuizCreate(
-        url=url_as_string, # Use the plain string here
-        title=scraped_data["title"],
-        raw_html=scraped_data["raw_html"],
-        summary=llm_data.get("summary", "No summary provided."),
-        key_entities=llm_data.get("key_entities", {}),
-        sections=scraped_data["sections"],
-        quiz_data=llm_data.get("quiz", []),
-        related_topics=llm_data.get("related_topics", []),
+    # AI Assessment
+    llm_result = generate_audit_report(metadata, req.job_description)
+    
+    audit_data = schemas.AuditCreate(
+        repo_url=repo_url_str,
+        job_description=req.job_description,
+        engineering_score=llm_result["engineering_score"],
+        match_score=llm_result.get("match_score"),
+        critique=llm_result["critique"],
+        verdict=llm_result["verdict"],
+        found_files=metadata["found_files"],
+        readme_content=metadata["readme_content"],
+        tech_stack=llm_result.get("tech_stack_inferred", metadata["tech_stack"])
     )
     
-    return crud.create_quiz(db=db, quiz_data=full_quiz_data)
+    return crud.create_audit(db=db, audit_data=audit_data)
 
-
-@app.get("/quizzes/", response_model=List[schemas.Quiz])
-def read_all_quizzes(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    """Retrieves a list of all previously generated quizzes from the database."""
-    quizzes = crud.get_quizzes(db, skip=skip, limit=limit)
-    return quizzes
-
-
-@app.get("/validate-url/", response_model=dict)
-def validate_url(url: str):
-    """
-    A lightweight endpoint for the frontend to quickly check if a URL is valid 
-    and fetch its title for a better user experience.
-    """
-    try:
-        headers = {'User-Agent': 'IntelliQuizApp/1.0 (test@example.com)'}
-        response = requests.get(url, headers=headers, timeout=5)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.content, 'html.parser')
-        title = soup.find('h1', id='firstHeading')
-        if title:
-            return {"title": title.text}
-        raise HTTPException(status_code=422, detail="URL is valid but no article title was found.")
-    except requests.exceptions.RequestException:
-        raise HTTPException(status_code=400, detail="Invalid or unreachable URL.")
+@app.get("/history/", response_model=List[schemas.AuditResponse])
+def get_audit_history(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    """Retrieves previous audits."""
+    return crud.get_audits(db, skip=skip, limit=limit)

@@ -1,43 +1,36 @@
 from pydantic import BaseModel, HttpUrl
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
+from datetime import datetime
 
 # --- Request Models ---
-# This model validates the incoming URL from the user. Using HttpUrl here is correct.
-class QuizGenerationRequest(BaseModel):
-    url: HttpUrl
+class AuditRequest(BaseModel):
+    repo_url: HttpUrl
+    job_description: Optional[str] = None
 
 # --- Response Models ---
-# This defines the shape of the data sent back to the frontend.
-class Quiz(BaseModel):
+class AuditResponse(BaseModel):
     id: int
-    url: str # Use string for consistency in response
-    title: str
-    summary: str
-    quiz_data: List[Dict[str, Any]]
-    key_entities: Dict[str, List[str]]
-    sections: List[str]
-    related_topics: List[str]
-
-    class Config:
-        from_attributes = True
-
-class QuizInfo(BaseModel):
-    id: int
-    url: str
-    title: str
+    repo_url: str
+    job_description: Optional[str] = None
+    engineering_score: float
+    match_score: Optional[float] = None
+    critique: str
+    verdict: str
+    found_files: List[str]
+    tech_stack: List[str]
+    created_at: datetime
 
     class Config:
         from_attributes = True
 
 # --- Internal Data Models ---
-# This model is used to create the database entry. The `url` field MUST be a plain string
-# because this is what SQLAlchemy will pass to the database driver.
-class QuizCreate(BaseModel):
-    url: str 
-    title: str
-    summary: str
-    quiz_data: List[Dict[str, Any]]
-    key_entities: Dict[str, List[str]]
-    sections: List[str]
-    related_topics: List[str]
-    raw_html: str
+class AuditCreate(BaseModel):
+    repo_url: str
+    job_description: Optional[str] = None
+    engineering_score: float
+    match_score: Optional[float] = None
+    critique: str
+    verdict: str
+    found_files: List[str]
+    readme_content: Optional[str] = None
+    tech_stack: List[str]
