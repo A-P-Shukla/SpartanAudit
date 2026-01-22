@@ -1,0 +1,139 @@
+.appWrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.header {
+  background-color: var(--surface-color);
+  box-shadow: var(--box-shadow);
+  padding: 1rem 2rem;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--primary-color);
+}
+
+.headerContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logo {
+  height: 32px;
+  width: 32px;
+}
+
+.appName {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-color);
+}
+
+.mainContent {
+  flex-grow: 1;
+  width: 100%;
+  max-width: 1100px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.tabContainer {
+  display: flex;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 2rem;
+}
+
+.tab {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: var(--secondary-color);
+  border-bottom: 3px solid transparent;
+  transform: translateY(1px);
+  transition: var(--transition);
+}
+
+.tab:hover {
+  color: var(--primary-color);
+}
+
+.tab.active {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+}
+
+.footer {
+  padding: 1.5rem 2rem;
+  color: var(--secondary-color);
+  font-size: 0.9rem;
+  background-color: var(--surface-color);
+  border-top: 1px solid var(--border-color);
+  margin-top: 2rem;
+}
+
+.footerContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap; /* Allows stacking on smaller screens */
+  gap: 1rem;
+}
+
+.footerText {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.socialLinks {
+  display: flex;
+  gap: 1.25rem;
+  align-items: center;
+}
+
+.socialLinks a {
+  color: var(--secondary-color);
+  transition: var(--transition);
+  display: inline-block; /* Necessary for transform */
+}
+
+.socialLinks a:hover {
+  color: var(--primary-color);
+  transform: translateY(-2px); /* Lifts the icon on hover */
+}
+
+/* --- Media Queries for Responsive Design --- */
+@media (max-width: 768px) {
+  .header {
+    padding: 1rem;
+  }
+  
+  .appName {
+    font-size: 1.25rem;
+  }
+
+  .mainContent {
+    margin: 1rem auto;
+    padding: 0 0.5rem;
+  }
+
+  .tabContainer {
+    /* Allows scrolling if tabs overflow on very small screens */
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .footerContent {
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+}
