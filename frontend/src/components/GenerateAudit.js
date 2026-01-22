@@ -5,6 +5,7 @@ import styles from './GenerateAudit.module.css';
 const GenerateAudit = ({ apiUrl, onAuditComplete }) => {
     const [repoUrl, setRepoUrl] = useState('');
     const [jobDescription, setJobDescription] = useState('');
+    const [forceReaudit, setForceReaudit] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -16,7 +17,8 @@ const GenerateAudit = ({ apiUrl, onAuditComplete }) => {
         try {
             const response = await axios.post(`${apiUrl}/audit/`, {
                 repo_url: repoUrl,
-                job_description: jobDescription || null
+                job_description: jobDescription || null,
+                force_reaudit: forceReaudit
             });
             onAuditComplete(response.data);
         } catch (err) {
@@ -55,6 +57,17 @@ const GenerateAudit = ({ apiUrl, onAuditComplete }) => {
                         className={styles.textarea}
                         rows={4}
                     />
+                </div>
+
+                <div className={styles.checkboxGroup}>
+                    <label>
+                        <input
+                            type="checkbox"
+                            checked={forceReaudit}
+                            onChange={(e) => setForceReaudit(e.target.checked)}
+                        />
+                        Force Re-audit (bypass cache)
+                    </label>
                 </div>
 
                 {error && <div className={styles.error}>{error}</div>}

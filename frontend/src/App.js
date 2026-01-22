@@ -4,7 +4,7 @@ import GenerateAudit from './components/GenerateAudit';
 import AuditHistory from './components/AuditHistory';
 import AuditReport from './components/AuditReport';
 
-const API_URL = 'http://localhost:8000'; // Hardcoded for local dev
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
 function App() {
   const [activeTab, setActiveTab] = useState('new');

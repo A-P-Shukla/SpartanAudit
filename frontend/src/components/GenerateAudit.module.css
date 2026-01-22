@@ -102,3 +102,22 @@
     border: 1px solid #d63031;
     border-radius: 4px;
 }
+
+.checkboxGroup {
+    margin-bottom: 1.5rem;
+}
+
+.checkboxGroup label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #888;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.checkboxGroup input[type="checkbox"] {
+    accent-color: #c0392b;
+    width: 18px;
+    height: 18px;
+}

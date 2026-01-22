@@ -2,6 +2,10 @@ from sqlalchemy.orm import Session
 from sqlalchemy import desc
 from . import models, schemas
 
+def get_audit_by_url(db: Session, repo_url: str):
+    """Fetches an existing audit record from the DB by its repo URL."""
+    return db.query(models.Audit).filter(models.Audit.repo_url == repo_url).first()
+
 def get_audit(db: Session, audit_id: int):
     """Fetches a single audit record from the DB by its ID."""
     return db.query(models.Audit).filter(models.Audit.id == audit_id).first()

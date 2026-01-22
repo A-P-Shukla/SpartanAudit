@@ -6,6 +6,7 @@ from datetime import datetime
 class AuditRequest(BaseModel):
     repo_url: HttpUrl
     job_description: Optional[str] = None
+    force_reaudit: Optional[bool] = False # Bypass cache if True
 
 # --- Response Models ---
 class AuditResponse(BaseModel):
