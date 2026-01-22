@@ -1,4 +1,4 @@
 backend/env
 backend/.env
 backend/app/__pycache__
-frontend/.gitignore
+frontend/node_modules
