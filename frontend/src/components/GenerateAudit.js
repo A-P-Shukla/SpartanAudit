@@ -70,10 +70,22 @@ const GenerateAudit = ({ apiUrl, onAuditComplete }) => {
                     </label>
                 </div>
 
+                <div className={styles.disclaimer}>
+                    <div className={styles.disclaimerHeader}>
+                        <span className={styles.disclaimerIcon}>⚠️</span>
+                        <span>AUDIT PROTOCOL DISCLOSURE</span>
+                    </div>
+                    <p className={styles.disclaimerText}>
+                        SpartanAudit performs <strong>High-Level Reconnaissance</strong> based on repository metadata, directory structure, and engineering artifacts (Docker, CI/CD, ML models).
+                        We do <strong>NOT</strong> perform a full LINE-BY-LINE SOURCE CODE AUDIT.
+                    </p>
+                </div>
+
                 {error && <div className={styles.error}>{error}</div>}
 
                 <button type="submit" className={styles.submitButton} disabled={loading}>
-                    {loading ? 'RUNNING AUDIT...' : 'AUDIT THIS REPO'}
+                    <span className={styles.buttonText}>{loading ? 'RUNNING RECON...' : 'EXECUTE AUDIT'}</span>
+                    <div className={loading ? styles.loadingBarActive : styles.loadingBar}></div>
                 </button>
             </form>
         </div>

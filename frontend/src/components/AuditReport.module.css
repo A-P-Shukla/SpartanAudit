@@ -164,3 +164,25 @@
     font-family: monospace;
     border: 1px solid #2980b9;
 }
+
+.reportDisclaimer {
+    margin-top: 3rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 8px;
+    border: 1px dashed #333;
+}
+
+.reportDisclaimer p {
+    margin: 0;
+    color: #666;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    text-align: center;
+}
+
+.reportDisclaimer strong {
+    color: #ffc107;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}

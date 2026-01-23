@@ -58,6 +58,13 @@ const AuditReport = ({ data, onBack }) => {
                     </div>
                 </div>
             </div>
+
+            <div className={styles.reportDisclaimer}>
+                <p>
+                    <strong>Spartan Note:</strong> This assessment is a <strong>High-Level Reconnaissance</strong> based on repository metadata and engineering artifacts.
+                    It is <strong>NOT</strong> a comprehensive, <strong>LINE-BY-LINE SOURCE CODE AUDIT</strong>.
+                </p>
+            </div>
         </div>
     );
 };

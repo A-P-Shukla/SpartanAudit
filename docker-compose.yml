@@ -1,9 +1,7 @@
-version: '3.8'
-
 services:
   # Database Service
   db:
-    image: postgres:15-alpine
+    image: postgres:17-alpine
     container_name: spartan-db
     environment:
       POSTGRES_USER: postgres
