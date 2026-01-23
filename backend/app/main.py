@@ -24,9 +24,17 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# Parse CORS origins from environment variable
+origins_env = os.getenv("CORS_ORIGINS", "")
+origins = [origin.strip() for origin in origins_env.split(",") if origin.strip()] if origins_env else ["*"]
+
+# Ensure localhost is always allowed for local dev if not strictly overridden
+if "http://localhost:3000" not in origins and "*" not in origins:
+     origins.append("http://localhost:3000")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=os.getenv("CORS_ORIGINS", "http://localhost:3000").split(","),
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
