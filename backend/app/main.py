@@ -290,6 +290,10 @@ def generate_audit_report(metadata: dict, jd: Optional[str]):
     except json.JSONDecodeError:
         raise HTTPException(status_code=500, detail="The AI brain glitched. Result: " + response_str)
 
+@app.api_route("/", methods=["GET", "HEAD"])
+async def health_check():
+    return {"status": "ok", "message": "SpartanAudit backend is running"}
+
 @app.post("/audit/", response_model=schemas.AuditResponse, status_code=201)
 def run_audit(req: schemas.AuditRequest, db: Session = Depends(get_db)):
     repo_url_str = str(req.repo_url)
