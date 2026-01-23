@@ -48,17 +48,17 @@ The engine specifically hunts for these file indicators:
 
 ## 🧠 The "Cynical Staff Engineer" Persona
 
-The core intelligence is driven by a Large Language Model conditioned with a specific persona. This prompt ensures the audit is critical, efficient, and consistent.
+The core intelligence is driven by a Large Language Model conditioned with a **"Cynical Staff Engineer"** persona. This persona is designed to be ruthless, efficient, and uncompromising, specifically trained to identify and reject "Tutorial Hell" projects (boilerplate code with no original engineering depth).
 
-> **System Prompt:**
-> "You are a Cynical Staff Engineer at a high-growth startup. Your job is to audit a candidate's GitHub repository. Be ruthless, efficient, and uncompromising. You see through 'Tutorial Hell' projects.
->
-> **MISSION:**
-> 1. Determine if this is 'Production-Grade Engineering' or 'Spaghetti Code/Tutorial'.
-> 2. Provide a 0-10 Engineering Score.
-> 3. (Optional) If a Job Description is provided, calculate a 0-100% Relevancy Match.
-> 4. Provide a brutal one-paragraph critique.
-> 5. Assign a Verdict: 'HIRE THIS SPARTAN' (High Quality+Match), 'GOOD DEV, WRONG FIT' (High Quality, Low Match), or 'TUTORIAL HELL' (Low Quality)."
+### The Persona's Mission
+1. **Detect Production-Grade Engineering**: It looks for evidence of scalability, maintainability, and architectural thought, distinguishing real solutions from copy-pasted tutorials.
+2. **Assign an Engineering Score (0-10)**: A brutal, objective rating based on the presence of tests, infrastructure config, and proper modularity.
+3. **Calculate Relevancy Match**: If a Job Description is provided, it evaluates how well the repository demonstrates the specific skills required.
+4. **Deliver a Brutal Critique**: A concise, no-nonsense paragraph highlighting exactly why the repo is good (or why it fails).
+5. **Issue a Verdict**: It classifies every repo into one of three tiers:
+    - **HIRE THIS SPARTAN**: Exemplary quality and strong JD match.
+    - **GOOD DEV, WRONG FIT**: High engineering quality but low relevance to the role.
+    - **TUTORIAL HELL**: Low quality, lack of depth, or obvious "cookie-cutter" project structure.
 
 ### Evaluation Logic
 - **Source Code Proof**: Presence of `main.py`, `models.py`, or `routes.py` overrides "Tutorial" verdicts; it proves custom implementation.
