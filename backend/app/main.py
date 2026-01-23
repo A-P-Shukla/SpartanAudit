@@ -41,7 +41,7 @@ def get_github_raw_url(repo_url: str, file_path: str, branch: str = "main"):
     owner, repo = path_parts[0], path_parts[1]
     return f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{file_path}"
 
-def get_all_directories_recursive(repo_url: str, path: str = "", depth: int = 0, max_depth: int = 2, max_total_dirs: int = 20):
+def get_all_directories_recursive(repo_url: str, path: str = "", depth: int = 0, max_depth: int = 2, max_total_dirs: int = 15):
     """
     Recursively fetches ALL directories in a repository up to max_depth.
     Returns a list of directory paths (e.g., ['', 'backend/', 'backend/app/', 'frontend/src/']).
@@ -60,7 +60,7 @@ def get_all_directories_recursive(repo_url: str, path: str = "", depth: int = 0,
     api_url = f"https://api.github.com/repos/{owner}/{repo}/contents/{path}"
     
     try:
-        res = requests.get(api_url, timeout=3)  # Strict 3-second timeout
+        res = requests.get(api_url, timeout=2)  # Strict 2-second timeout
         if res.status_code == 200:
             contents = res.json()
             for item in contents:
@@ -128,6 +128,25 @@ def fetch_repo_metadata(repo_url: str):
             "train.json", "test.json", "data.json",
             # ML config files
             "config.yaml", "config.yml", "mlflow.yml", "dvc.yaml", "params.yaml"
+        ],
+        "source_code": [
+            # Entry points - Proof the app actually runs
+            "main.py", "app.py", "server.py", "manage.py",
+            "index.js", "server.js", "index.ts", "main.ts",
+            "main.go", "main.rs",
+            # Database schemas - Kills "SQLite tutorial" myth
+            "database.py", "db.py", "connection.py",
+            "prisma/schema.prisma", "drizzle.config.ts",
+            "alembic/versions/*.py", "migrations/*.py",
+            # Models & schemas - Complexity proof
+            "models.py", "models.ts", "schema.py", "schemas.py",
+            "entities.py", "entity.py",
+            # Routing/Architecture - Not just one file
+            "routes.py", "router.py", "urls.py", "views.py",
+            "router.js", "routes.ts", "controllers.ts",
+            "App.tsx", "App.jsx", "app/layout.tsx",
+            # Business logic
+            "services.py", "service.py", "utils.py", "helpers.py"
         ]
     }
     
@@ -138,6 +157,7 @@ def fetch_repo_metadata(repo_url: str):
     readme_content = ""
     tech_stack = []
     ml_artifacts = []  # Track ML/DS specific files
+    source_code_files = []  # Track actual source code
     
     # Try 'main' then 'master' branches
     for branch in ["main", "master"]:
@@ -154,7 +174,7 @@ def fetch_repo_metadata(repo_url: str):
                     if not raw_url: continue
                     
                     try:
-                        res = requests.get(raw_url, timeout=5)
+                        res = requests.get(raw_url, timeout=2)
                         if res.status_code == 200:
                             current_found.append(full_path)
                             # Prefer root README, but take subdir if not found
@@ -164,6 +184,8 @@ def fetch_repo_metadata(repo_url: str):
                                 tech_stack.append(full_path)
                             if category == "ml_artifacts":
                                 ml_artifacts.append(full_path)
+                            if category == "source_code":
+                                source_code_files.append(full_path)
                     except:
                         pass
         
@@ -178,7 +200,8 @@ def fetch_repo_metadata(repo_url: str):
         "found_files": found_files,
         "readme_content": readme_content,
         "tech_stack": tech_stack,
-        "ml_artifacts": ml_artifacts
+        "ml_artifacts": ml_artifacts,
+        "source_code_files": source_code_files
     }
 
 def generate_audit_report(metadata: dict, jd: Optional[str]):
@@ -199,9 +222,17 @@ def generate_audit_report(metadata: dict, jd: Optional[str]):
     - Files detected: {found_files}
     - Tech stack identified: {tech_stack}
     - ML/Data Science Artifacts: {ml_artifacts}
+    - **SOURCE CODE PROOF**: {source_code_files}
     - README Content: {readme_content}
 
     CRITICAL EVALUATION RULES:
+    
+    **SOURCE CODE PROOF (Use This First):**
+    - If main.py, app.py, database.py, models.py, routes.py, or App.tsx are found: THIS IS REAL CODE, NOT A TUTORIAL.
+    - Source files in multiple directories = modular architecture = GOOD.
+    - database.py or schema.prisma = they're using a real database, not SQLite hello-world.
+    - migrations/ folder = production-ready data management.
+    - DO NOT critique "lack of code evidence" if source_code_files is populated.
     
     **For ML/Data Science Projects:**
     - Jupyter notebooks (.ipynb) are LEGITIMATE tools for exploration and analysis, NOT tutorial markers.
@@ -248,6 +279,7 @@ def generate_audit_report(metadata: dict, jd: Optional[str]):
         "found_files": metadata["found_files"],
         "tech_stack": metadata["tech_stack"],
         "ml_artifacts": metadata.get("ml_artifacts", []),
+        "source_code_files": metadata.get("source_code_files", []),
         "readme_content": metadata["readme_content"],
         "jd_section": jd_section
     })
