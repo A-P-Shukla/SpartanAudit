@@ -40,19 +40,23 @@ async def health_check():
     return {"status": "ok", "message": "SpartanAudit backend is running"}
 
 @app.post("/audit/", response_model=schemas.AuditResponse, status_code=201)
-def run_audit(req: schemas.AuditRequest, db: Session = Depends(get_db)):
+def run_audit(req: schemas.AuditRequest):
     repo_url_str = str(req.repo_url)
     
-    # --- CACHING: Check if we already audited this repo ---
+    # --- CACHING CHECK (Short Session) ---
     if not req.force_reaudit:
-        existing_audit = crud.get_audit_by_url(db, repo_url=repo_url_str)
-        if existing_audit:
-            return existing_audit
+        db = next(get_db())
+        try:
+            existing_audit = crud.get_audit_by_url(db, repo_url=repo_url_str)
+            if existing_audit:
+                return existing_audit
+        finally:
+            db.close()
     
-    # Metadata gathering (Reconnaissance)
+    # Metadata gathering (Reconnaissance) - NO DB CONNECTION HELD
     metadata = fetch_repo_metadata(repo_url_str)
     
-    # AI Assessment
+    # AI Assessment - NO DB CONNECTION HELD (Can take 30+ seconds)
     llm_result = generate_audit_report(metadata, req.job_description)
     
     audit_data = schemas.AuditCreate(
@@ -67,7 +71,12 @@ def run_audit(req: schemas.AuditRequest, db: Session = Depends(get_db)):
         tech_stack=llm_result.get("tech_stack_inferred", metadata["tech_stack"])
     )
     
-    return crud.create_audit(db=db, audit_data=audit_data)
+    # --- COMMIT TO DB (Fresh Session) ---
+    db = next(get_db())
+    try:
+        return crud.create_audit(db=db, audit_data=audit_data)
+    finally:
+        db.close()
 
 @app.get("/history/", response_model=List[schemas.AuditResponse])
 def get_history(skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
